@@ -27,20 +27,20 @@
             background-color: var(--lepaya-neutral-50); 
             color: var(--lepaya-charcoal); 
         }
-       .game-container { max-width: 800px; margin: auto; }
-       .choice-button { 
+      .game-container { max-width: 800px; margin: auto; }
+      .choice-button { 
             transition: all 0.2s ease-in-out;
             background-color: var(--lepaya-white);
             color: var(--lepaya-blurple);
             border-color: var(--lepaya-blurple);
         }
-       .choice-button:hover { 
+      .choice-button:hover { 
             transform: translateY(-2px); 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
             background-color: var(--lepaya-light-blurple);
         }
-       .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
-       .modal-content { 
+      .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
+      .modal-content { 
             background-color: var(--lepaya-white); 
             margin: 10% auto; 
             padding: 20px; 
@@ -50,26 +50,25 @@
             position: relative; 
             box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
         }
-       .modal-close { position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; color: var(--lepaya-medium-grey); }
-       .modal-close:hover { color: var(--lepaya-charcoal); }
+      .modal-close { position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; color: var(--lepaya-medium-grey); }
+      .modal-close:hover { color: var(--lepaya-charcoal); }
         
-       .progress-dot { width: 10px; height: 10px; border-radius: 50%; background-color: var(--lepaya-light-grey); display: inline-block; margin: 0 3px; }
-       .progress-dot.active { background-color: var(--lepaya-blurple); }
-       .progress-dot.completed { background-color: var(--lepaya-coral); }
+      .progress-dot { width: 10px; height: 10px; border-radius: 50%; background-color: var(--lepaya-light-grey); display: inline-block; margin: 0 3px; }
+      .progress-dot.active { background-color: var(--lepaya-blurple); }
+      .progress-dot.completed { background-color: var(--lepaya-coral); }
         
-       .lepaya-orange-text { color: var(--lepaya-brand-orange); } /* Updated class name */
+      .lepaya-orange-text { color: var(--lepaya-brand-orange); }
 
-        /* Tailwind class overrides/extensions might be needed if not using :root variables directly in class definitions */
-       .bg-lepaya-blurple { background-color: var(--lepaya-blurple); }
-       .text-lepaya-blurple { color: var(--lepaya-blurple); }
-       .hover\:bg-lepaya-blurple-dark:hover { background-color: #3A39B4; } /* Slightly darker Blurple for hover */
+      .bg-lepaya-blurple { background-color: var(--lepaya-blurple); }
+      .text-lepaya-blurple { color: var(--lepaya-blurple); }
+      .hover\:bg-lepaya-blurple-dark:hover { background-color: #3A39B4; } 
         
-       .bg-lepaya-coral { background-color: var(--lepaya-coral); }
-       .text-lepaya-coral { color: var(--lepaya-coral); }
-       .hover\:bg-lepaya-coral-dark:hover { background-color: #E64B4B; } /* Slightly darker Coral for hover */
+      .bg-lepaya-coral { background-color: var(--lepaya-coral); }
+      .text-lepaya-coral { color: var(--lepaya-coral); }
+      .hover\:bg-lepaya-coral-dark:hover { background-color: #E64B4B; }
 
-       .text-lepaya-charcoal { color: var(--lepaya-charcoal); }
-       .text-lepaya-white { color: var(--lepaya-white); }
+      .text-lepaya-charcoal { color: var(--lepaya-charcoal); }
+      .text-lepaya-white { color: var(--lepaya-white); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -112,7 +111,7 @@
     </div>
 
     <div id="infoModal" class="modal">
-        <div class="modal-content"> {/* Removed animate-fadeIn as it's not defined */}
+        <div class="modal-content">
             <span id="modalCloseButton" class="modal-close">&times;</span>
             <h3 id="modalTitle" class="text-xl font-semibold text-lepaya-blurple mb-3">Insight Unlocked!</h3>
             <div id="modalText" class="text-lepaya-charcoal prose prose-sm max-w-none"></div>
@@ -201,7 +200,7 @@
                 ]
             }
         ],
-        info: { // Note: HTML tags like <strong> and <span> are used here for styling within the modal.
+        info: { 
             preparednessGap: "<strong>The AI Readiness Gap:</strong> While 85% of organizations are fast-tracking AI adoption, a mere 26% feel adequately prepared. This highlights HR's critical role in bridging this gap. (Source: [1])",
             humanAiEquation: "<strong>The Human-AI Equation:</strong> Success lies in balancing AI's capabilities with human connection. <span class='lepaya-orange-text'>Lepaya</span> believes AI's true power is realized when it augments human capabilities and enhances employee experience. (Source: [2, 3, 4])",
             deiAndBias: "<strong>AI in DEI & Bias:</strong> AI can mitigate unconscious bias (e.g., AI hiring systems improve diversity metrics by up to 29% [5]). However, AI trained on biased data can perpetuate biases (e.g., Amazon's past recruiting tool issues [6]). Vigilant oversight and ethical AI development are crucial. (Source: [5, 6, 7, 8, 9])",
@@ -282,12 +281,12 @@
         }
 
         const scenario = stage.scenarios;
-        scenarioTextEl.innerHTML = scenario.text; // Use innerHTML for <span class='lepaya-orange-text'>
+        scenarioTextEl.innerHTML = scenario.text; 
         choicesContainerEl.innerHTML = '';
 
         scenario.choices.forEach(choice => {
             const button = document.createElement('button');
-            button.innerHTML = choice.text; // Use innerHTML if choices can also contain styled text
+            button.innerHTML = choice.text; 
             button.className = 'choice-button font-semibold py-3 px-4 border rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--lepaya-blurple)] w-full text-left';
             button.onclick = () => handleChoice(choice.infoKey, scenario);
             choicesContainerEl.appendChild(button);
@@ -311,7 +310,7 @@
     function handleChoice(infoKey, scenario) {
         const infoText = gameData.info[infoKey] |
 | "No specific info for this choice, but consider the implications!";
-        modalTextEl.innerHTML = infoText; // Use innerHTML for styled text in modal
+        modalTextEl.innerHTML = infoText; 
         infoModalEl.style.display = 'flex';
         scenario.explored = true;
         exploredTopics.add(gameData.stages.title.split(':').trim() + ": " + infoKey);
@@ -334,7 +333,7 @@
         exploredTopics.forEach(topic => {
             const themeTitlePart = topic.substring(0, topic.indexOf(':'));
             const stageObj = gameData.stages.find(s => s.title.startsWith(themeTitlePart));
-            const displayTheme = stageObj? stageObj.title.split(':')?.[1]trim() : "Key Concept";
+            const displayTheme = stageObj && stageObj.title.split(':')?[1] stageObj.title.split(':').[1]trim() : "Key Concept";
             uniqueThemes.add(displayTheme |
 | "Key Concept");
         });
