@@ -22,72 +22,124 @@
         No charts are needed for this game-like format; focus is on textual information revealed through interaction.
     -->
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f5f5f4; /* stone-100 */ color: #262626; /* neutral-800 */ }
+        :root {
+            --lepaya-blurple: #4E4CEC;
+            --lepaya-coral: #FF6060;
+            --lepaya-yellow: #FEF074;
+            --lepaya-navy: #192F4D;
+            --lepaya-charcoal: #2C3138;
+            --lepaya-light-blurple: #CAD5FF;
+            --lepaya-light-coral: #FBC9C1;
+            --lepaya-light-yellow: #FFF8D4;
+            --lepaya-neutral-50: #F6F6FE; /* Main page background */
+            --lepaya-medium-grey: #C0C0C0;
+            --lepaya-light-grey: #EFEFEF;
+            --lepaya-white: #FFFFFF;
+            --lepaya-brand-orange: #FF6B00; /* For specific Lepaya mentions */
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--lepaya-neutral-50); 
+            color: var(--lepaya-charcoal); 
+        }
         .game-container { max-width: 800px; margin: auto; }
-        .choice-button { transition: all 0.2s ease-in-out; }
-        .choice-button:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .choice-button { 
+            transition: all 0.2s ease-in-out;
+            background-color: var(--lepaya-white);
+            color: var(--lepaya-blurple);
+            border-color: var(--lepaya-blurple);
+        }
+        .choice-button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            background-color: var(--lepaya-light-blurple);
+        }
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
-        .modal-content { background-color: #fff; margin: 10% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 600px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .modal-close { position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; color: #757575; }
-        .modal-close:hover { color: #000; }
-        .progress-dot { width: 10px; height: 10px; border-radius: 50%; background-color: #d1d5db; /* gray-300 */ display: inline-block; margin: 0 3px; }
-        .progress-dot.active { background-color: #0D9488; /* teal-600 */ }
-        .progress-dot.completed { background-color: #F59E0B; /* amber-500 */ }
-        .lepaya-orange { color: #FF6B00; }
+        .modal-content { 
+            background-color: var(--lepaya-white); 
+            margin: 10% auto; 
+            padding: 20px; 
+            border-radius: 8px; 
+            width: 90%; 
+            max-width: 600px; 
+            position: relative; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
+        }
+        .modal-close { position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; color: var(--lepaya-medium-grey); }
+        .modal-close:hover { color: var(--lepaya-charcoal); }
+        
+        .progress-dot { width: 10px; height: 10px; border-radius: 50%; background-color: var(--lepaya-light-grey); display: inline-block; margin: 0 3px; }
+        .progress-dot.active { background-color: var(--lepaya-blurple); }
+        .progress-dot.completed { background-color: var(--lepaya-coral); }
+        
+        .lepaya-orange-text { color: var(--lepaya-brand-orange); } /* Updated class name */
+
+        /* Tailwind class overrides/extensions might be needed if not using :root variables directly in class definitions */
+        .bg-lepaya-blurple { background-color: var(--lepaya-blurple); }
+        .text-lepaya-blurple { color: var(--lepaya-blurple); }
+        .hover\:bg-lepaya-blurple-dark:hover { background-color: #3A39B4; } /* Slightly darker Blurple for hover */
+        
+        .bg-lepaya-coral { background-color: var(--lepaya-coral); }
+        .text-lepaya-coral { color: var(--lepaya-coral); }
+        .hover\:bg-lepaya-coral-dark:hover { background-color: #E64B4B; } /* Slightly darker Coral for hover */
+
+        .text-lepaya-charcoal { color: var(--lepaya-charcoal); }
+        .text-lepaya-white { color: var(--lepaya-white); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div id="gameContainer" class="game-container bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full">
+    <div id="gameContainer" class="game-container bg-lepaya-white p-6 sm:p-8 rounded-xl shadow-2xl w-full">
         <header class="mb-6 text-center">
-            <h1 class="text-3xl sm:text-4xl font-bold text-teal-700">HR AI Navigator</h1>
-            <p class="text-neutral-600 mt-1">Guide your organization through the AI transformation.</p>
-            <p class="text-sm text-neutral-500">Welcome, <span class="lepaya-orange">Ian</span> from Lepaya!</p>
+            <h1 class="text-3xl sm:text-4xl font-bold text-lepaya-blurple">HR AI Navigator</h1>
+            <p class="text-lepaya-charcoal mt-1">Guide your organization through the AI transformation.</p>
+            <p class="text-sm text-lepaya-charcoal opacity-75">Welcome, <span class="lepaya-orange-text">Ian</span> from Lepaya!</p>
         </header>
 
         <div id="stageArea" class="mb-4">
-            <h2 id="stageTitle" class="text-xl sm:text-2xl font-semibold text-teal-600 mb-2 text-center"></h2>
+            <h2 id="stageTitle" class="text-xl sm:text-2xl font-semibold text-lepaya-blurple mb-2 text-center"></h2>
             <div id="scenarioProgress" class="flex justify-center mb-4"></div>
         </div>
 
         <div id="scenarioArea" class="mb-6">
-            <p id="scenarioText" class="text-lg text-neutral-700 mb-6 leading-relaxed"></p>
+            <p id="scenarioText" class="text-lg text-lepaya-charcoal mb-6 leading-relaxed"></p>
             <div id="choicesContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             </div>
         </div>
         
         <div id="startScreen" class="text-center">
-            <h2 class="text-2xl font-semibold text-teal-600 mb-4">Ready to Lead?</h2>
-            <p class="text-neutral-700 mb-6">You are an HR Leader tasked with navigating the complexities of AI adoption. Make strategic choices to unlock insights and guide your organization towards a human-centered AI future.</p>
-            <button id="startButton" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out text-lg">
+            <h2 class="text-2xl font-semibold text-lepaya-blurple mb-4">Ready to Lead?</h2>
+            <p class="text-lepaya-charcoal mb-6">You are an HR Leader tasked with navigating the complexities of AI adoption. Make strategic choices to unlock insights and guide your organization towards a human-centered AI future.</p>
+            <button id="startButton" class="bg-lepaya-blurple hover:bg-lepaya-blurple-dark text-lepaya-white font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out text-lg">
                 Start Your Journey
             </button>
         </div>
 
         <div id="completionScreen" class="text-center" style="display: none;">
-            <h2 class="text-2xl font-semibold text-amber-600 mb-4">Journey Completed!</h2>
-            <p class="text-neutral-700 mb-6">Congratulations, HR Leader! You've navigated key aspects of AI in HR. Remember, the journey of AI adoption is ongoing and requires continuous learning and adaptation. The goal is to ensure that as technology advances, humanity at work is enhanced.</p>
-            <p class="text-neutral-700 mb-2"><strong>Key Themes Explored:</strong></p>
-            <ul id="exploredThemesList" class="list-disc list-inside text-neutral-600 mb-6 text-left mx-auto max-w-md">
+            <h2 class="text-2xl font-semibold text-lepaya-coral mb-4">Journey Completed!</h2>
+            <p class="text-lepaya-charcoal mb-6">Congratulations, HR Leader! You've navigated key aspects of AI in HR. Remember, the journey of AI adoption is ongoing and requires continuous learning and adaptation. The goal is to ensure that as technology advances, humanity at work is enhanced.</p>
+            <p class="text-lepaya-charcoal mb-2"><strong>Key Themes Explored:</strong></p>
+            <ul id="exploredThemesList" class="list-disc list-inside text-lepaya-charcoal mb-6 text-left mx-auto max-w-md">
             </ul>
-            <button id="restartButton" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out text-lg">
+            <button id="restartButton" class="bg-lepaya-blurple hover:bg-lepaya-blurple-dark text-lepaya-white font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out text-lg">
                 Restart Journey
             </button>
         </div>
     </div>
 
     <div id="infoModal" class="modal">
-        <div class="modal-content animate-fadeIn">
+        <div class="modal-content"> {/* Removed animate-fadeIn as it's not defined */}
             <span id="modalCloseButton" class="modal-close">&times;</span>
-            <h3 id="modalTitle" class="text-xl font-semibold text-teal-700 mb-3">Insight Unlocked!</h3>
-            <div id="modalText" class="text-neutral-700 prose prose-sm max-w-none"></div>
-            <button id="modalContinueButton" class="mt-6 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-opacity-75">
+            <h3 id="modalTitle" class="text-xl font-semibold text-lepaya-blurple mb-3">Insight Unlocked!</h3>
+            <div id="modalText" class="text-lepaya-charcoal prose prose-sm max-w-none"></div>
+            <button id="modalContinueButton" class="mt-6 bg-lepaya-coral hover:bg-lepaya-coral-dark text-lepaya-white font-semibold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75">
                 Continue
             </button>
         </div>
     </div>
     
-    <footer class="text-center text-neutral-500 mt-8 text-sm">
+    <footer class="text-center text-lepaya-charcoal opacity-75 mt-8 text-sm">
         <p>&copy; <span id="currentYear"></span> HR AI Navigator. Inspired by Lepaya Webinar Content.</p>
     </footer>
 
@@ -116,7 +168,7 @@
                         explored: false
                     },
                     {
-                        text: "L&D proposes using AI for personalized learning paths, a core area for <span class='lepaya-orange'>Lepaya</span>. How do you ensure this truly enhances employee skills?",
+                        text: "L&D proposes using AI for personalized learning paths, a core area for <span class='lepaya-orange-text'>Lepaya</span>. How do you ensure this truly enhances employee skills?",
                         choices: [
                             { text: "Focus on AI identifying skill gaps and curating content.", outcomeKey: "ldContentFocus", infoKey: "ldPersonalization" },
                             { text: "Emphasize human coaching and applied learning alongside AI.", outcomeKey: "ldHumanFocus", infoKey: "aiAsCollaborator" }
@@ -196,7 +248,7 @@
                         explored: false
                     },
                     {
-                        text: "How can HR ensure that AI in workforce planning focuses on employee growth, not just data points, aligning with <span class='lepaya-orange'>Lepaya</span>'s human-centered values?",
+                        text: "How can HR ensure that AI in workforce planning focuses on employee growth, not just data points, aligning with <span class='lepaya-orange-text'>Lepaya</span>'s human-centered values?",
                         choices: [
                             { text: "Use AI primarily for efficiency in identifying underperformers.", outcomeKey: "efficiencyFocusWP", infoKey: "humanCentricWorkforcePlanningConcern" },
                             { text: "Integrate AI insights with personalized development plans and career coaching.", outcomeKey: "developmentFocusWP", infoKey: "humanCentricWorkforcePlanningSolution" }
@@ -214,13 +266,13 @@
                 ]
             }
         ],
-        info: {
+        info: { // Note: HTML tags like <strong> and <span> are used here for styling within the modal.
             preparednessGap: "<strong>The AI Readiness Gap:</strong> While 85% of organizations are fast-tracking AI adoption, a mere 26% feel adequately prepared. This highlights HR's critical role in bridging this gap. (Source: [1])",
-            humanAiEquation: "<strong>The Human-AI Equation:</strong> Success lies in balancing AI's capabilities with human connection. <span class='lepaya-orange'>Lepaya</span> believes AI's true power is realized when it augments human capabilities and enhances employee experience. (Source: [3, 5, 7])",
+            humanAiEquation: "<strong>The Human-AI Equation:</strong> Success lies in balancing AI's capabilities with human connection. <span class='lepaya-orange-text'>Lepaya</span> believes AI's true power is realized when it augments human capabilities and enhances employee experience. (Source: [3, 5, 7])",
             deiAndBias: "<strong>AI in DEI & Bias:</strong> AI can mitigate unconscious bias (e.g., AI hiring systems improve diversity metrics by up to 29% [6]). However, AI trained on biased data can perpetuate biases (e.g., Amazon's past recruiting tool issues [8]). Vigilant oversight and ethical AI development are crucial. (Source: [6, 8, 9, 15, 16])",
             taValue: "<strong>Value in Talent Acquisition:</strong> AI streamlines recruitment, improving candidate velocity (Eaton: 4x talent network, 30-40% faster [8]), reducing screening time (Siemens: 60% less [6]), and enhancing hire quality (LinkedIn ATS: 40% better [10]). (Source: [2, 6, 8, 9, 10])",
-            ldPersonalization: "<strong>AI in L&D:</strong> AI facilitates personalized learning, enhancing engagement and retention. It identifies skills gaps for targeted training. <span class='lepaya-orange'>Lepaya</span> uses AI-powered exercises. By 2025, 60% of corporate training may be AI-driven. (Source: [2, 5, 11])",
-            aiAsCollaborator: "<strong>AI as Collaborator:</strong> AI augments human roles, handling data-intensive tasks, freeing HR for strategic work. <span class='lepaya-orange'>Lepaya</span>: 'Train employees to collaborate with AI, not compete.' Human intelligence provides ethical oversight and strategic direction. (Source: [7, 13])",
+            ldPersonalization: "<strong>AI in L&D:</strong> AI facilitates personalized learning, enhancing engagement and retention. It identifies skills gaps for targeted training. <span class='lepaya-orange-text'>Lepaya</span> uses AI-powered exercises. By 2025, 60% of corporate training may be AI-driven. (Source: [2, 5, 11])",
+            aiAsCollaborator: "<strong>AI as Collaborator:</strong> AI augments human roles, handling data-intensive tasks, freeing HR for strategic work. <span class='lepaya-orange-text'>Lepaya</span>: 'Train employees to collaborate with AI, not compete.' Human intelligence provides ethical oversight and strategic direction. (Source: [7, 13])",
             aiLiteracyLimitations: "<strong>AI Literacy - Understanding Limitations:</strong> True AI literacy involves knowing AI's capabilities AND limitations, and how models are trained. It's not just about using tools, but critically evaluating their outputs. (Source: [17])",
             aiLiteracyAndDataFluency: "<strong>AI Literacy & Data Fluency:</strong> HR must interpret, analyze, and critically use AI-generated data for strategic decisions. This is more than just understanding terminology. (Source: [17, 18, 19, 20])",
             augmentedHumanSkillsDetail: "<strong>Augmented Human Skills:</strong> As AI handles routine tasks, skills like critical thinking, problem-solving, creativity, adaptability, and ethical judgment (in application) become paramount. Emotional intelligence and empathy are also key. (Source: [17, 18])",
@@ -236,7 +288,7 @@
             aiGovernanceDaunting: "<strong>AI Governance Complexity:</strong> Establishing AI governance can seem daunting. Attempting a perfect, all-encompassing policy document from day one might lead to paralysis. (Source: [1, 28])",
             aiGovernanceFirstStep: "<strong>Practical First Step in AI Governance:</strong> Start by forming a cross-functional team (HR, IT, Legal, business units) to define core ethical principles, identify key AI risks relevant to your organization, and establish a process for reviewing AI tools. (Source: [15, 27, 28, 29])",
             humanCentricWorkforcePlanningConcern: "<strong>Risk in AI Workforce Planning:</strong> If AI is used solely for efficiency metrics (e.g., identifying underperformers) without a human-centric lens, it can demotivate employees and undermine trust. (Source: [6, 27])",
-            humanCentricWorkforcePlanningSolution: "<strong>Human-Centric AI in Workforce Planning:</strong> Use AI insights (e.g., skills forecasting, internal mobility opportunities) to power personalized development plans, career coaching, and proactive reskilling, aligning with <span class='lepaya-orange'>Lepaya</span>'s values. (Source: [2, 10, 27])",
+            humanCentricWorkforcePlanningSolution: "<strong>Human-Centric AI in Workforce Planning:</strong> Use AI insights (e.g., skills forecasting, internal mobility opportunities) to power personalized development plans, career coaching, and proactive reskilling, aligning with <span class='lepaya-orange-text'>Lepaya</span>'s values. (Source: [2, 10, 27])",
             futureAgenticAIConcern: "<strong>Challenge of Agentic AI:</strong> More autonomous AI systems (agentic AI) will present new challenges for oversight and ethical control. A 'wait and see' approach could leave the organization unprepared. (Source: [31])",
             futureAgenticAISolution: "<strong>Preparing for Agentic AI:</strong> Proactively strengthen organization-wide AI literacy regarding autonomous systems. Reinforce ethical oversight frameworks and processes now to prepare for future AI capabilities, ensuring human control is maintained. (Source: [1, 17, 28, 31])"
         }
@@ -290,18 +342,18 @@
         const stage = gameData.stages[currentStageIndex];
         if (currentScenarioIndex >= stage.scenarios.length) {
             currentStageIndex++;
-            loadStage(); // Load next stage
+            loadStage(); 
             return;
         }
 
         const scenario = stage.scenarios[currentScenarioIndex];
-        scenarioTextEl.innerHTML = scenario.text;
+        scenarioTextEl.innerHTML = scenario.text; // Use innerHTML for <span class='lepaya-orange-text'>
         choicesContainerEl.innerHTML = '';
 
         scenario.choices.forEach(choice => {
             const button = document.createElement('button');
-            button.innerHTML = choice.text;
-            button.className = 'choice-button bg-white hover:bg-teal-50 text-teal-700 font-semibold py-3 px-4 border border-teal-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 w-full text-left';
+            button.innerHTML = choice.text; // Use innerHTML if choices can also contain styled text
+            button.className = 'choice-button font-semibold py-3 px-4 border rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--lepaya-blurple)] w-full text-left';
             button.onclick = () => handleChoice(choice.infoKey, scenario);
             choicesContainerEl.appendChild(button);
         });
@@ -323,10 +375,10 @@
 
     function handleChoice(infoKey, scenario) {
         const infoText = gameData.info[infoKey] || "No specific info for this choice, but consider the implications!";
-        modalTextEl.innerHTML = infoText;
+        modalTextEl.innerHTML = infoText; // Use innerHTML for styled text in modal
         infoModalEl.style.display = 'flex';
         scenario.explored = true;
-        exploredTopics.add(gameData.stages[currentStageIndex].title.split(':')[0].trim() + ": " + infoKey); // Track explored topic
+        exploredTopics.add(gameData.stages[currentStageIndex].title.split(':')[0].trim() + ": " + infoKey);
     }
 
     function continueGame() {
@@ -343,11 +395,11 @@
         
         exploredThemesListEl.innerHTML = '';
         const uniqueThemes = new Set();
-        // Extract broader themes from exploredTopics
         exploredTopics.forEach(topic => {
-            // Example: "Part 1: preparednessGap" -> "AI's Impact & Value Creation"
-            const themeTitle = topic.substring(0, topic.indexOf(':')).replace(/Part \d+/, gameData.stages.find(s => topic.startsWith(s.title.split(':')[0].trim()))?.title.split(':')[1]?.trim() || "Key Concept");
-            uniqueThemes.add(themeTitle.trim());
+            const themeTitlePart = topic.substring(0, topic.indexOf(':'));
+            const stageObj = gameData.stages.find(s => s.title.startsWith(themeTitlePart));
+            const displayTheme = stageObj ? stageObj.title.split(':')[1]?.trim() : "Key Concept";
+            uniqueThemes.add(displayTheme || "Key Concept");
         });
 
         if (uniqueThemes.size > 0) {
@@ -372,7 +424,6 @@
         }
     }
 
-    // Initially hide game elements and show start screen
     gameContainerElements.forEach(el => el.style.display = 'none');
     completionScreenEl.style.display = 'none';
     startScreenEl.style.display = 'block';
