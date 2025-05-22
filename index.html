@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR AI Navigator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Application Structure Plan: A scenario-based interactive experience. User plays as an HR leader.
+        - Main screen: Displays current stage, scenario, and choices.
+        - Stages: Correspond to the 4 main parts of the source document.
+        - Scenarios: Derived from key challenges, stats, and concepts in the document.
+        - Choices: Lead to different feedback and information reveals.
+        - Information Modal: Pops up after a choice, showing relevant text snippets from the document.
+        - Progress Tracker: Visual cue for topics explored within a stage.
+        This structure is chosen to make the dense information from the report more engaging and digestible through active participation and decision-making, rather than passive reading.
+    -->
+    <!-- Visualization & Content Choices:
+        - Scenarios & Choices (HTML/JS): Core interactive element. Goal: Engage/Explore.
+        - Information Modals (HTML/JS): Display text snippets. Goal: Inform/Reinforce.
+        - Progress Indicators (HTML/CSS/JS): Visual feedback. Goal: Motivate/Track.
+        - Content derived directly from the immersive artifact cb272696-5223-4b3b-9dd0-2fca42edbdce.
+        No charts are needed for this game-like format; focus is on textual information revealed through interaction.
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f5f5f4; /* stone-100 */ color: #262626; /* neutral-800 */ }
+        .game-container { max-width: 800px; margin: auto; }
+        .choice-button { transition: all 0.2s ease-in-out; }
+        .choice-button:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
+        .modal-content { background-color: #fff; margin: 10% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 600px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-close { position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; color: #757575; }
+        .modal-close:hover { color: #000; }
+        .progress-dot { width: 10px; height: 10px; border-radius: 50%; background-color: #d1d5db; /* gray-300 */ display: inline-block; margin: 0 3px; }
+        .progress-dot.active { background-color: #0D9488; /* teal-600 */ }
+        .progress-dot.completed { background-color: #F59E0B; /* amber-500 */ }
+        .lepaya-orange { color: #FF6B00; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div id="gameContainer" class="game-container bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full">
+        <header class="mb-6 text-center">
+            <h1 class="text-3xl sm:text-4xl font-bold text-teal-700">HR AI Navigator</h1>
+            <p class="text-neutral-600 mt-1">Guide your organization through the AI transformation.</p>
+            <p class="text-sm text-neutral-500">Welcome, <span class="lepaya-orange">Ian</span> from Lepaya!</p>
+        </header>
+
+        <div id="stageArea" class="mb-4">
+            <h2 id="stageTitle" class="text-xl sm:text-2xl font-semibold text-teal-600 mb-2 text-center"></h2>
+            <div id="scenarioProgress" class="flex justify-center mb-4"></div>
+        </div>
+
+        <div id="scenarioArea" class="mb-6">
+            <p id="scenarioText" class="text-lg text-neutral-700 mb-6 leading-relaxed"></p>
+            <div id="choicesContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            </div>
+        </div>
+        
+        <div id="startScreen" class="text-center">
+            <h2 class="text-2xl font-semibold text-teal-600 mb-4">Ready to Lead?</h2>
+            <p class="text-neutral-700 mb-6">You are an HR Leader tasked with navigating the complexities of AI adoption. Make strategic choices to unlock insights and guide your organization towards a human-centered AI future.</p>
+            <button id="startButton" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out text-lg">
+                Start Your Journey
+            </button>
+        </div>
+
+        <div id="completionScreen" class="text-center" style="display: none;">
+            <h2 class="text-2xl font-semibold text-amber-600 mb-4">Journey Completed!</h2>
+            <p class="text-neutral-700 mb-6">Congratulations, HR Leader! You've navigated key aspects of AI in HR. Remember, the journey of AI adoption is ongoing and requires continuous learning and adaptation. The goal is to ensure that as technology advances, humanity at work is enhanced.</p>
+            <p class="text-neutral-700 mb-2"><strong>Key Themes Explored:</strong></p>
+            <ul id="exploredThemesList" class="list-disc list-inside text-neutral-600 mb-6 text-left mx-auto max-w-md">
+            </ul>
+            <button id="restartButton" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-150 ease-in-out text-lg">
+                Restart Journey
+            </button>
+        </div>
+    </div>
+
+    <div id="infoModal" class="modal">
+        <div class="modal-content animate-fadeIn">
+            <span id="modalCloseButton" class="modal-close">&times;</span>
+            <h3 id="modalTitle" class="text-xl font-semibold text-teal-700 mb-3">Insight Unlocked!</h3>
+            <div id="modalText" class="text-neutral-700 prose prose-sm max-w-none"></div>
+            <button id="modalContinueButton" class="mt-6 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-opacity-75">
+                Continue
+            </button>
+        </div>
+    </div>
+    
+    <footer class="text-center text-neutral-500 mt-8 text-sm">
+        <p>&copy; <span id="currentYear"></span> HR AI Navigator. Inspired by Lepaya Webinar Content.</p>
+    </footer>
+
+<script>
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    const gameData = {
+        stages: [
+            {
+                title: "Part 1: AI's Impact & Value Creation",
+                scenarios: [
+                    {
+                        text: "Your CEO is excited about AI and mentions that 85% of organizations are fast-tracking AI adoption. However, you recall only 26% feel prepared. What's your initial thought for the HR strategy?",
+                        choices: [
+                            { text: "Focus on rapid tech deployment to keep up.", outcomeKey: "techFocus", infoKey: "preparednessGap" },
+                            { text: "Prioritize building organizational readiness and a human-centered approach.", outcomeKey: "readinessFocus", infoKey: "humanAiEquation" }
+                        ],
+                        explored: false
+                    },
+                    {
+                        text: "The Talent Acquisition team wants to implement an AI tool for resume screening, citing Siemens' 60% time reduction. What's your primary concern to address first?",
+                        choices: [
+                            { text: "Potential for algorithmic bias.", outcomeKey: "biasConcern", infoKey: "deiAndBias" },
+                            { text: "Ensuring quick ROI through speed.", outcomeKey: "roiConcernTA", infoKey: "taValue" }
+                        ],
+                        explored: false
+                    },
+                    {
+                        text: "L&D proposes using AI for personalized learning paths, a core area for <span class='lepaya-orange'>Lepaya</span>. How do you ensure this truly enhances employee skills?",
+                        choices: [
+                            { text: "Focus on AI identifying skill gaps and curating content.", outcomeKey: "ldContentFocus", infoKey: "ldPersonalization" },
+                            { text: "Emphasize human coaching and applied learning alongside AI.", outcomeKey: "ldHumanFocus", infoKey: "aiAsCollaborator" }
+                        ],
+                        explored: false
+                    }
+                ]
+            },
+            {
+                title: "Part 2: Essential HR Skills for an AI Future",
+                scenarios: [
+                    {
+                        text: "An AI tool provides surprising data insights for workforce planning. What skill is most crucial for your HR team to apply?",
+                        choices: [
+                            { text: "Technical skill to tweak the AI algorithm.", outcomeKey: "tweakAlgo", infoKey: "aiLiteracyLimitations" },
+                            { text: "AI Literacy & Data Fluency to critically interpret and use the data.", outcomeKey: "interpretData", infoKey: "aiLiteracyAndDataFluency" }
+                        ],
+                        explored: false
+                    },
+                    {
+                        text: "When deploying a new AI HR tool, what 'Augmented Human Skill' should your team prioritize to ensure ethical application?",
+                        choices: [
+                            { text: "Speed in learning the tool's features.", outcomeKey: "speedLearn", infoKey: "augmentedHumanSkillsDetail" },
+                            { text: "Ethical judgment and bias awareness in its practical use.", outcomeKey: "ethicalJudgment", infoKey: "ethicalReasoning" }
+                        ],
+                        explored: false
+                    },
+                     {
+                        text: "Your organization is lagging in AI vision, yet only 7% of HR orgs have a formal AI strategy. How do you start building AI-related skills in your team?",
+                        choices: [
+                            { text: "Wait for a top-down company-wide AI strategy.", outcomeKey: "waitStrategy", infoKey: "laggingOrgStrategy" },
+                            { text: "Initiate foundational AI literacy programs and pilot small projects.", outcomeKey: "initiateLiteracy", infoKey: "proactiveSkillBuilding" }
+                        ],
+                        explored: false
+                    }
+                ]
+            },
+            {
+                title: "Part 3: Overcoming Barriers to AI Adoption",
+                scenarios: [
+                    {
+                        text: "Employees express fear of job displacement due to a new AI initiative (a common barrier). What's your primary strategy?",
+                        choices: [
+                            { text: "Highlight AI's efficiency and cost savings to management.", outcomeKey: "highlightEfficiency", infoKey: "fearOfJobDisplacement" },
+                            { text: "Communicate transparently, reframe AI as augmentation, and focus on upskilling.", outcomeKey: "transparentComms", infoKey: "overcomingFear" }
+                        ],
+                        explored: false
+                    },
+                    {
+                        text: "Leadership is hesitant to invest further in AI for HR due to unclear ROI, a key barrier. How do you build their confidence?",
+                        choices: [
+                            { text: "Propose a large-scale, comprehensive AI overhaul for maximum impact.", outcomeKey: "largeScaleOverhaul", infoKey: "unclearROI" },
+                            { text: "Start with pilot programs in high-impact areas, showcasing measurable wins and strategic value.", outcomeKey: "pilotPrograms", infoKey: "overcomingUnclearROI" }
+                        ],
+                        explored: false
+                    },
+                    {
+                        text: "A Great Place To Work report notes that failing to train the workforce on AI erodes trust. Your company is considering an AI tool, but training budget is tight. What do you advocate for?",
+                        choices:
+                        [
+                            { text: "Roll out the tool with minimal training to save costs initially.", outcomeKey: "minimalTraining", infoKey: "lackOfTrustBarrier" },
+                            { text: "Insist on adequate, persona-based training to build trust and ensure effective adoption.", outcomeKey: "adequateTraining", infoKey: "overcomingLackOftrust" }
+                        ],
+                        explored: false
+                    }
+                ]
+            },
+            {
+                title: "Part 4: HR as the Trusted AI Guide",
+                scenarios: [
+                    {
+                        text: "To guide AI adoption enterprise-wide, HR needs to establish robust AI governance. What's a practical first step?",
+                        choices: [
+                            { text: "Draft a complex, all-encompassing AI policy document immediately.", outcomeKey: "complexPolicy", infoKey: "aiGovernanceDaunting" },
+                            { text: "Form a small, cross-functional team to define initial ethical principles and identify key AI risks.", outcomeKey: "crossFunctionalTeam", infoKey: "aiGovernanceFirstStep" }
+                        ],
+                        explored: false
+                    },
+                    {
+                        text: "How can HR ensure that AI in workforce planning focuses on employee growth, not just data points, aligning with <span class='lepaya-orange'>Lepaya</span>'s human-centered values?",
+                        choices: [
+                            { text: "Use AI primarily for efficiency in identifying underperformers.", outcomeKey: "efficiencyFocusWP", infoKey: "humanCentricWorkforcePlanningConcern" },
+                            { text: "Integrate AI insights with personalized development plans and career coaching.", outcomeKey: "developmentFocusWP", infoKey: "humanCentricWorkforcePlanningSolution" }
+                        ],
+                        explored: false
+                    },
+                    {
+                        text: "With 'agentic AI' on the horizon, potentially acting more autonomously, what proactive step should HR take NOW?",
+                        choices: [
+                            { text: "Wait and see how agentic AI develops before planning.", outcomeKey: "waitAgenticAI", infoKey: "futureAgenticAIConcern" },
+                            { text: "Strengthen AI literacy on autonomous systems and reinforce ethical oversight frameworks.", outcomeKey: "prepareAgenticAI", infoKey: "futureAgenticAISolution" }
+                        ],
+                        explored: false
+                    }
+                ]
+            }
+        ],
+        info: {
+            preparednessGap: "<strong>The AI Readiness Gap:</strong> While 85% of organizations are fast-tracking AI adoption, a mere 26% feel adequately prepared. This highlights HR's critical role in bridging this gap. (Source: [1])",
+            humanAiEquation: "<strong>The Human-AI Equation:</strong> Success lies in balancing AI's capabilities with human connection. <span class='lepaya-orange'>Lepaya</span> believes AI's true power is realized when it augments human capabilities and enhances employee experience. (Source: [3, 5, 7])",
+            deiAndBias: "<strong>AI in DEI & Bias:</strong> AI can mitigate unconscious bias (e.g., AI hiring systems improve diversity metrics by up to 29% [6]). However, AI trained on biased data can perpetuate biases (e.g., Amazon's past recruiting tool issues [8]). Vigilant oversight and ethical AI development are crucial. (Source: [6, 8, 9, 15, 16])",
+            taValue: "<strong>Value in Talent Acquisition:</strong> AI streamlines recruitment, improving candidate velocity (Eaton: 4x talent network, 30-40% faster [8]), reducing screening time (Siemens: 60% less [6]), and enhancing hire quality (LinkedIn ATS: 40% better [10]). (Source: [2, 6, 8, 9, 10])",
+            ldPersonalization: "<strong>AI in L&D:</strong> AI facilitates personalized learning, enhancing engagement and retention. It identifies skills gaps for targeted training. <span class='lepaya-orange'>Lepaya</span> uses AI-powered exercises. By 2025, 60% of corporate training may be AI-driven. (Source: [2, 5, 11])",
+            aiAsCollaborator: "<strong>AI as Collaborator:</strong> AI augments human roles, handling data-intensive tasks, freeing HR for strategic work. <span class='lepaya-orange'>Lepaya</span>: 'Train employees to collaborate with AI, not compete.' Human intelligence provides ethical oversight and strategic direction. (Source: [7, 13])",
+            aiLiteracyLimitations: "<strong>AI Literacy - Understanding Limitations:</strong> True AI literacy involves knowing AI's capabilities AND limitations, and how models are trained. It's not just about using tools, but critically evaluating their outputs. (Source: [17])",
+            aiLiteracyAndDataFluency: "<strong>AI Literacy & Data Fluency:</strong> HR must interpret, analyze, and critically use AI-generated data for strategic decisions. This is more than just understanding terminology. (Source: [17, 18, 19, 20])",
+            augmentedHumanSkillsDetail: "<strong>Augmented Human Skills:</strong> As AI handles routine tasks, skills like critical thinking, problem-solving, creativity, adaptability, and ethical judgment (in application) become paramount. Emotional intelligence and empathy are also key. (Source: [17, 18])",
+            ethicalReasoning: "<strong>Ethical Reasoning & Oversight:</strong> HR must ensure AI applications are fair, transparent, and compliant, actively mitigating bias and protecting data privacy. This is a non-negotiable competency. (Source: [15, 16, 17, 18])",
+            laggingOrgStrategy: "<strong>Lagging AI Vision:</strong> Many organizations lack a formal AI strategy (only 7% of HR orgs have one [22]). Waiting for a top-down directive can mean falling behind. HR can still act.",
+            proactiveSkillBuilding: "<strong>Proactive Skill Building:</strong> Even without a broad organizational strategy, HR can begin building AI literacy and data fluency within its own team, perhaps through targeted training or pilot projects. This demonstrates initiative and prepares HR for a larger role. (Source: [1, 22])",
+            fearOfJobDisplacement: "<strong>Fear of Job Displacement:</strong> This is a primary emotional barrier. Focusing solely on efficiency can exacerbate these fears. (Source: [1, 23])",
+            overcomingFear: "<strong>Overcoming Fear:</strong> Reframe AI as augmentation. Communicate transparently about role evolution and invest in upskilling. Address fears directly and empathetically. (Source: [1, 23, 24])",
+            unclearROI: "<strong>Unclear ROI Barrier:</strong> Many HR teams struggle to quantify AI benefits, leading to uncertainty. A large-scale overhaul without proven value is risky. (Source: [1, 22])",
+            overcomingUnclearROI: "<strong>Demonstrating ROI:</strong> Start with pilot projects in high-impact areas. Measure success, showcase wins, and articulate benefits beyond cost-cutting to build confidence and momentum. (Source: [1, 20, 22])",
+            lackOfTrustBarrier: "<strong>Lack of Trust Barrier:</strong> Failing to adequately train the workforce on AI tools is a major mistake that erodes trust and fuels resistance. Minimal training to save costs can backfire. (Source: [24])",
+            overcomingLackOftrust: "<strong>Building Trust via Training:</strong> Invest in comprehensive, persona-based AI literacy and tool training. Involve employees in AI discussions and ensure transparent AI governance. (Source: [7, 22, 24])",
+            aiGovernanceDaunting: "<strong>AI Governance Complexity:</strong> Establishing AI governance can seem daunting. Attempting a perfect, all-encompassing policy document from day one might lead to paralysis. (Source: [1, 28])",
+            aiGovernanceFirstStep: "<strong>Practical First Step in AI Governance:</strong> Start by forming a cross-functional team (HR, IT, Legal, business units) to define core ethical principles, identify key AI risks relevant to your organization, and establish a process for reviewing AI tools. (Source: [15, 27, 28, 29])",
+            humanCentricWorkforcePlanningConcern: "<strong>Risk in AI Workforce Planning:</strong> If AI is used solely for efficiency metrics (e.g., identifying underperformers) without a human-centric lens, it can demotivate employees and undermine trust. (Source: [6, 27])",
+            humanCentricWorkforcePlanningSolution: "<strong>Human-Centric AI in Workforce Planning:</strong> Use AI insights (e.g., skills forecasting, internal mobility opportunities) to power personalized development plans, career coaching, and proactive reskilling, aligning with <span class='lepaya-orange'>Lepaya</span>'s values. (Source: [2, 10, 27])",
+            futureAgenticAIConcern: "<strong>Challenge of Agentic AI:</strong> More autonomous AI systems (agentic AI) will present new challenges for oversight and ethical control. A 'wait and see' approach could leave the organization unprepared. (Source: [31])",
+            futureAgenticAISolution: "<strong>Preparing for Agentic AI:</strong> Proactively strengthen organization-wide AI literacy regarding autonomous systems. Reinforce ethical oversight frameworks and processes now to prepare for future AI capabilities, ensuring human control is maintained. (Source: [1, 17, 28, 31])"
+        }
+    };
+
+    let currentStageIndex = 0;
+    let currentScenarioIndex = 0;
+    let exploredTopics = new Set();
+
+    const stageTitleEl = document.getElementById('stageTitle');
+    const scenarioTextEl = document.getElementById('scenarioText');
+    const choicesContainerEl = document.getElementById('choicesContainer');
+    const infoModalEl = document.getElementById('infoModal');
+    const modalTitleEl = document.getElementById('modalTitle');
+    const modalTextEl = document.getElementById('modalText');
+    const modalCloseButton = document.getElementById('modalCloseButton');
+    const modalContinueButton = document.getElementById('modalContinueButton');
+    const startButton = document.getElementById('startButton');
+    const restartButton = document.getElementById('restartButton');
+    const startScreenEl = document.getElementById('startScreen');
+    const gameContainerElements = [document.getElementById('stageArea'), document.getElementById('scenarioArea')];
+    const completionScreenEl = document.getElementById('completionScreen');
+    const scenarioProgressEl = document.getElementById('scenarioProgress');
+    const exploredThemesListEl = document.getElementById('exploredThemesList');
+
+
+    function startGame() {
+        startScreenEl.style.display = 'none';
+        completionScreenEl.style.display = 'none';
+        gameContainerElements.forEach(el => el.style.display = 'block');
+        currentStageIndex = 0;
+        currentScenarioIndex = 0;
+        exploredTopics.clear();
+        gameData.stages.forEach(stage => stage.scenarios.forEach(s => s.explored = false));
+        loadStage();
+    }
+
+    function loadStage() {
+        if (currentStageIndex >= gameData.stages.length) {
+            showCompletionScreen();
+            return;
+        }
+        const stage = gameData.stages[currentStageIndex];
+        stageTitleEl.textContent = stage.title;
+        currentScenarioIndex = 0;
+        loadScenario();
+        updateScenarioProgress();
+    }
+
+    function loadScenario() {
+        const stage = gameData.stages[currentStageIndex];
+        if (currentScenarioIndex >= stage.scenarios.length) {
+            currentStageIndex++;
+            loadStage(); // Load next stage
+            return;
+        }
+
+        const scenario = stage.scenarios[currentScenarioIndex];
+        scenarioTextEl.innerHTML = scenario.text;
+        choicesContainerEl.innerHTML = '';
+
+        scenario.choices.forEach(choice => {
+            const button = document.createElement('button');
+            button.innerHTML = choice.text;
+            button.className = 'choice-button bg-white hover:bg-teal-50 text-teal-700 font-semibold py-3 px-4 border border-teal-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 w-full text-left';
+            button.onclick = () => handleChoice(choice.infoKey, scenario);
+            choicesContainerEl.appendChild(button);
+        });
+        updateScenarioProgress();
+    }
+    
+    function updateScenarioProgress() {
+        const stage = gameData.stages[currentStageIndex];
+        if (!stage) return;
+        scenarioProgressEl.innerHTML = '';
+        stage.scenarios.forEach((scenario, index) => {
+            const dot = document.createElement('span');
+            dot.className = 'progress-dot';
+            if (index === currentScenarioIndex && !scenario.explored) dot.classList.add('active');
+            if (scenario.explored) dot.classList.add('completed');
+            scenarioProgressEl.appendChild(dot);
+        });
+    }
+
+    function handleChoice(infoKey, scenario) {
+        const infoText = gameData.info[infoKey] || "No specific info for this choice, but consider the implications!";
+        modalTextEl.innerHTML = infoText;
+        infoModalEl.style.display = 'flex';
+        scenario.explored = true;
+        exploredTopics.add(gameData.stages[currentStageIndex].title.split(':')[0].trim() + ": " + infoKey); // Track explored topic
+    }
+
+    function continueGame() {
+        infoModalEl.style.display = 'none';
+        currentScenarioIndex++;
+        loadScenario();
+    }
+
+    function showCompletionScreen() {
+        gameContainerElements.forEach(el => el.style.display = 'none');
+        completionScreenEl.style.display = 'block';
+        stageTitleEl.textContent = "Journey Complete";
+        scenarioProgressEl.innerHTML = '';
+        
+        exploredThemesListEl.innerHTML = '';
+        const uniqueThemes = new Set();
+        // Extract broader themes from exploredTopics
+        exploredTopics.forEach(topic => {
+            // Example: "Part 1: preparednessGap" -> "AI's Impact & Value Creation"
+            const themeTitle = topic.substring(0, topic.indexOf(':')).replace(/Part \d+/, gameData.stages.find(s => topic.startsWith(s.title.split(':')[0].trim()))?.title.split(':')[1]?.trim() || "Key Concept");
+            uniqueThemes.add(themeTitle.trim());
+        });
+
+        if (uniqueThemes.size > 0) {
+            uniqueThemes.forEach(theme => {
+                const li = document.createElement('li');
+                li.textContent = theme;
+                exploredThemesListEl.appendChild(li);
+            });
+        } else {
+            exploredThemesListEl.innerHTML = '<li>You blazed through! Consider revisiting choices to explore more insights.</li>';
+        }
+    }
+
+    startButton.addEventListener('click', startGame);
+    restartButton.addEventListener('click', startGame);
+    modalCloseButton.addEventListener('click', () => infoModalEl.style.display = 'none');
+    modalContinueButton.addEventListener('click', continueGame);
+    
+    window.onclick = function(event) {
+        if (event.target == infoModalEl) {
+            infoModalEl.style.display = "none";
+        }
+    }
+
+    // Initially hide game elements and show start screen
+    gameContainerElements.forEach(el => el.style.display = 'none');
+    completionScreenEl.style.display = 'none';
+    startScreenEl.style.display = 'block';
+    stageTitleEl.textContent = "Welcome!";
+
+</script>
+</body>
+</html>
